@@ -1,5 +1,5 @@
 import { settings } from "@/platform/env/backend.env";
-import { makeCORSMiddleware } from "@/platform/middleware";
+import { makeCORSMiddleware, makeRequestIDMiddleware } from "@/platform/middleware";
 import { registerHealthPing } from "@/platform/ping";
 import express, { Express } from "express";
 import { Server } from "node:http";
@@ -9,6 +9,7 @@ export function setupEnvSettings(app: Express) {
 }
 
 export function setupMiddleware(app: Express) {
+  app.use(makeRequestIDMiddleware());
   app.use(express.json());
   app.use(makeCORSMiddleware());
 }

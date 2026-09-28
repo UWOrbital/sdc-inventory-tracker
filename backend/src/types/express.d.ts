@@ -5,5 +5,9 @@ declare global {
     interface Locals {
       settings: BackendSettings;
     }
+
+    interface Request {
+      id: string;
+    }
   }
 }
