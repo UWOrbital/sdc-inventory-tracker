@@ -1,6 +1,8 @@
 import "dotenv/config";
-import { corsEnvSchema } from "@/platform/env/cors.env";
 import z from "zod";
+
+import { corsEnvSchema } from "@/platform/env/cors.env";
+import { generalEnvSchema } from "@/platform/env/general.env";
 
 function loadEnv<S extends z.ZodType>(schema: S): Readonly<z.output<S>> {
   const result = schema.safeParse(process.env);
@@ -14,6 +16,7 @@ function loadEnv<S extends z.ZodType>(schema: S): Readonly<z.output<S>> {
 
 export class BackendSettings {
   public readonly cors = loadEnv(corsEnvSchema);
+  public readonly general = loadEnv(generalEnvSchema);
 }
 
 export const settings = new BackendSettings();

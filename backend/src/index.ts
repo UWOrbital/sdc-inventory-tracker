@@ -1,18 +1,19 @@
-import { registerHealthPing } from "@/platform/ping";
-import { setupEnvSettings, setupMiddleware } from "@/platform/setups";
+import { setupEnvSettings, setupMiddleware, setupRoutes, shutdown } from "@/platform/setups";
 import express from "express";
 
 function main() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
 
   setupEnvSettings(app);
   setupMiddleware(app);
-  registerHealthPing(app);
+  setupRoutes(app);
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  const server = app.listen(app.locals.settings.general.PORT, () => {
+    console.log(`Server running on port ${app.locals.settings.general.PORT}`);
   });
+
+  process.once("SIGTERM", () => void shutdown("SIGTERM", server));
+  process.once("SIGINT", () => void shutdown("SIGINT", server));
 }
 
 main();
