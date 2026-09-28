@@ -5,6 +5,7 @@ import express, { Express } from "express";
 import { settings } from "@/platform/env/backend.env";
 import {
   makeCORSMiddleware,
+  makeDrizzleMiddleware,
   makeLoggingMiddleware,
   makeRequestIDMiddleware,
 } from "@/platform/middleware";
@@ -18,7 +19,8 @@ export function setupMiddleware(app: Express) {
   app.use(makeRequestIDMiddleware());
   app.use(makeLoggingMiddleware());
   app.use(express.json());
-  app.use(makeCORSMiddleware());
+  app.use(makeCORSMiddleware(app.locals.settings));
+  app.use(makeDrizzleMiddleware(app.locals.settings));
 }
 
 export function setupRoutes(app: Express) {

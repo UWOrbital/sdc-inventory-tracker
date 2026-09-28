@@ -1,3 +1,4 @@
+import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
 
 declare global {
@@ -8,6 +9,7 @@ declare global {
 
     interface Request {
       id: string;
+      db: Database;
     }
   }
 }

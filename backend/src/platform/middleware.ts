@@ -5,9 +5,10 @@ import { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 
 import { LOG_FORMAT, REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
-import { settings } from "@/platform/env/backend.env";
+import { makeDB } from "@/platform/database/pool";
+import { BackendSettings } from "@/platform/env/backend.env";
 
-export function makeCORSMiddleware() {
+export function makeCORSMiddleware(settings: BackendSettings) {
   return cors({
     origin: settings.cors.CORS_ALLOW_ORIGINS,
     credentials: settings.cors.CORS_ALLOW_CREDENTIALS,
@@ -21,6 +22,13 @@ export function makeRequestIDMiddleware() {
     const incoming = req.get(REQUEST_ID_HEADER);
     req.id = incoming && VALID_REQUEST_ID.test(incoming) ? incoming : randomUUID();
     res.setHeader(REQUEST_ID_HEADER, req.id);
+    next();
+  };
+}
+
+export function makeDrizzleMiddleware(settings: BackendSettings) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    req.db = makeDB(settings);
     next();
   };
 }
