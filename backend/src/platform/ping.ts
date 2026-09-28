@@ -1,7 +1,7 @@
-import type { Express, Request, Response } from "express";
+import { Express, Request, Response } from "express";
 
 export function registerHealthPing(app: Express) {
-  app.get("/", (req: Request, res: Response) => {
+  app.get("/", (_: Request, res: Response) => {
     res.json({ message: "PONG" });
   });
 }
