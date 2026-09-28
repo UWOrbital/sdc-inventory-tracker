@@ -3,7 +3,11 @@ import { Server } from "node:http";
 import express, { Express } from "express";
 
 import { settings } from "@/platform/env/backend.env";
-import { makeCORSMiddleware, makeRequestIDMiddleware } from "@/platform/middleware";
+import {
+  makeCORSMiddleware,
+  makeLoggingMiddleware,
+  makeRequestIDMiddleware,
+} from "@/platform/middleware";
 import { registerHealthPing } from "@/platform/ping";
 
 export function setupEnvSettings(app: Express) {
@@ -12,6 +16,7 @@ export function setupEnvSettings(app: Express) {
 
 export function setupMiddleware(app: Express) {
   app.use(makeRequestIDMiddleware());
+  app.use(makeLoggingMiddleware());
   app.use(express.json());
   app.use(makeCORSMiddleware());
 }

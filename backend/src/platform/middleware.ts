@@ -2,8 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import cors from "cors";
 import { NextFunction, Request, Response } from "express";
+import morgan from "morgan";
 
-import { REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
+import { LOG_FORMAT, REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
 import { settings } from "@/platform/env/backend.env";
 
 export function makeCORSMiddleware() {
@@ -22,4 +23,10 @@ export function makeRequestIDMiddleware() {
     res.setHeader(REQUEST_ID_HEADER, req.id);
     next();
   };
+}
+
+morgan.token<Request, Response>("id", (req) => req.id);
+
+export function makeLoggingMiddleware() {
+  return morgan<Request, Response>(LOG_FORMAT);
 }
