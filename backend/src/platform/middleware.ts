@@ -1,6 +1,7 @@
+import { randomUUID } from "node:crypto";
+
 import cors from "cors";
 import { NextFunction, Request, Response } from "express";
-import { randomUUID } from "node:crypto";
 
 import { REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
 import { settings } from "@/platform/env/backend.env";

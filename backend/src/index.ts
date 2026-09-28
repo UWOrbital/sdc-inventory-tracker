@@ -1,5 +1,6 @@
-import { setupEnvSettings, setupMiddleware, setupRoutes, shutdown } from "@/platform/setups";
 import express from "express";
+
+import { setupEnvSettings, setupMiddleware, setupRoutes, shutdown } from "@/platform/setups";
 
 function main() {
   const app = express();

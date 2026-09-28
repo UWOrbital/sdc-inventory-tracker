@@ -1,8 +1,10 @@
+import { Server } from "node:http";
+
+import express, { Express } from "express";
+
 import { settings } from "@/platform/env/backend.env";
 import { makeCORSMiddleware, makeRequestIDMiddleware } from "@/platform/middleware";
 import { registerHealthPing } from "@/platform/ping";
-import express, { Express } from "express";
-import { Server } from "node:http";
 
 export function setupEnvSettings(app: Express) {
   app.locals.settings = settings;
