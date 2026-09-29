@@ -3,6 +3,7 @@ import "dotenv/config";
 import z from "zod";
 
 import { corsEnvSchema } from "@/platform/env/cors.env";
+import { databaseEnvSchema } from "@/platform/env/db.env";
 import { generalEnvSchema } from "@/platform/env/general.env";
 
 function loadEnv<S extends z.ZodType>(schema: S): Readonly<z.output<S>> {
@@ -18,6 +19,7 @@ function loadEnv<S extends z.ZodType>(schema: S): Readonly<z.output<S>> {
 export class BackendSettings {
   public readonly cors = loadEnv(corsEnvSchema);
   public readonly general = loadEnv(generalEnvSchema);
+  public readonly db = loadEnv(databaseEnvSchema);
 }
 
 export const settings = new BackendSettings();
