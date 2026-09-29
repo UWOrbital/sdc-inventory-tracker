@@ -5,6 +5,7 @@ declare global {
   namespace Express {
     interface Locals {
       settings: BackendSettings;
+      db: Database;
     }
 
     interface Request {

@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 
 import { LOG_FORMAT, REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
-import { makeDB } from "@/platform/database/pool";
+import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
 
 export function makeCORSMiddleware(settings: BackendSettings) {
@@ -26,9 +26,9 @@ export function makeRequestIDMiddleware() {
   };
 }
 
-export function makeDrizzleMiddleware(settings: BackendSettings) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    req.db = makeDB(settings);
+export function makeDrizzleMiddleware(db: Database) {
+  return (req: Request, _: Response, next: NextFunction) => {
+    req.db = db;
     next();
   };
 }

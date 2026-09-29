@@ -8,7 +8,7 @@ export function makeDB(settings: BackendSettings) {
     host: settings.db.DB_HOST,
     user: settings.db.DB_USER,
     password: settings.db.DB_PASSWORD,
-    application_name: settings.db.DB_NAME,
+    database: settings.db.DB_NAME,
     port: settings.db.DB_PORT,
   });
 
