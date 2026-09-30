@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -29,19 +30,26 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@testcontainers/postgresql": "^12.2.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^26.6.2",
+    "@types/supertest": "^7.2.1",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.9",
+    "supertest": "^7.3.0",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^4.1.11"
   },
   "allowScripts": {
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "cpu-features@0.0.10": true,
+    "protobufjs@7.6.6": true,
+    "ssh2@1.17.0": true
   }
 }
