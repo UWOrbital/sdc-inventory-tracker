@@ -1,0 +1,13 @@
+services:
+  api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - backend/.env
+    environment:
+      - DB_HOST=host.docker.internal
