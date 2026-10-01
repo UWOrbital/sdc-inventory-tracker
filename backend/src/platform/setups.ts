@@ -1,9 +1,13 @@
 import { Server } from "node:http";
 
+import cookieParser from "cookie-parser";
 import express, { Express } from "express";
+import passport from "passport";
 
-import { makeDB } from "@/platform/database/pool";
-import { settings } from "@/platform/env/backend.env";
+import { registerAuthRoutes } from "@/platform/auth/auth.routes";
+import { registerAuthStrategies } from "@/platform/auth/strategies";
+import { Database } from "@/platform/database/pool";
+import { BackendSettings } from "@/platform/env/backend.env";
 import {
   makeCORSMiddleware,
   makeDrizzleMiddleware,
@@ -12,24 +16,31 @@ import {
 } from "@/platform/middleware";
 import { registerHealthPing } from "@/platform/ping";
 
-export function setupEnvSettings(app: Express) {
+export function setupEnvSettings(app: Express, settings: BackendSettings) {
   app.locals.settings = settings;
 }
 
-export function setupDatabase(app: Express) {
-  app.locals.db = makeDB(app.locals.settings);
+export function setupDatabase(app: Express, db: Database) {
+  app.locals.db = db;
 }
 
 export function setupMiddleware(app: Express) {
   app.use(makeRequestIDMiddleware());
   app.use(makeLoggingMiddleware());
   app.use(express.json());
+  app.use(cookieParser());
   app.use(makeCORSMiddleware(app.locals.settings));
   app.use(makeDrizzleMiddleware(app.locals.db));
 }
 
+export function setupAuth(app: Express) {
+  registerAuthStrategies();
+  app.use(passport.initialize());
+}
+
 export function setupRoutes(app: Express) {
   registerHealthPing(app);
+  registerAuthRoutes(app);
 }
 
 export async function shutdown(signal: string, server: Server, app: Express) {

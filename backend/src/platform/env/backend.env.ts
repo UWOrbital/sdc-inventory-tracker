@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import z from "zod";
 
+import { authEnvSchema } from "@/platform/env/auth.env";
 import { corsEnvSchema } from "@/platform/env/cors.env";
 import { databaseEnvSchema } from "@/platform/env/db.env";
 import { generalEnvSchema } from "@/platform/env/general.env";
@@ -20,6 +21,7 @@ export class BackendSettings {
   public readonly cors = loadEnv(corsEnvSchema);
   public readonly general = loadEnv(generalEnvSchema);
   public readonly db = loadEnv(databaseEnvSchema);
+  public readonly auth = loadEnv(authEnvSchema);
 }
 
 export const settings = new BackendSettings();

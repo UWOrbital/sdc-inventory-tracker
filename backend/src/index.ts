@@ -1,20 +1,10 @@
-import express from "express";
-
-import {
-  setupDatabase,
-  setupEnvSettings,
-  setupMiddleware,
-  setupRoutes,
-  shutdown,
-} from "@/platform/setups";
+import { createApp } from "@/app";
+import { makeDB } from "@/platform/database/pool";
+import { settings } from "@/platform/env/backend.env";
+import { shutdown } from "@/platform/setups";
 
 function main() {
-  const app = express();
-
-  setupEnvSettings(app);
-  setupDatabase(app);
-  setupMiddleware(app);
-  setupRoutes(app);
+  const app = createApp(settings, makeDB(settings));
 
   const server = app.listen(app.locals.settings.general.PORT, () => {
     console.log(`Server running on port ${app.locals.settings.general.PORT}`);
