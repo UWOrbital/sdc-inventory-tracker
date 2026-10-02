@@ -1,5 +1,25 @@
 # React + TypeScript + Vite
 
+## Linting and formatting
+
+Run these commands from `frontend/` after installing dependencies with `npm ci`:
+
+```sh
+npm run lint          # Check JavaScript, TypeScript, and React rules
+npm run lint:fix      # Apply available automatic lint fixes
+npm run format       # Format frontend source, configuration, and documentation
+npm run format:check # Check formatting without modifying files
+```
+
+From the repository root, use `npm --prefix frontend run <script>` instead.
+
+Prettier reads indentation and line endings from the root `.editorconfig` (two
+spaces and LF). The frontend Prettier config matches the backend's basic style:
+semicolons, double quotes, trailing commas, and a 100-character print width.
+Generated output, dependencies, the npm lockfile, and static assets are excluded
+from formatting. ESLint retains the React Hooks and Fast Refresh checks, and
+`eslint-config-prettier` disables rules that could conflict with formatting.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
@@ -17,9 +37,9 @@ If you are developing a production application, we recommend updating the config
 
 ```js
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(["dist"]),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     extends: [
       // Other configs...
 
@@ -34,42 +54,40 @@ export default defineConfig([
     ],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
         tsconfigRootDir: import.meta.dirname,
       },
       // other options...
     },
   },
-])
-
+]);
 ```
 
 You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
 // eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import reactX from "eslint-plugin-react-x";
+import reactDom from "eslint-plugin-react-dom";
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(["dist"]),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     extends: [
       // Other configs...
       // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
+      reactX.configs["recommended-typescript"],
       // Enable lint rules for React DOM
       reactDom.configs.recommended,
     ],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
         tsconfigRootDir: import.meta.dirname,
       },
       // other options...
     },
   },
-])
-
+]);
 ```
