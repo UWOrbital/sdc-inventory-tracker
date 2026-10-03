@@ -1,3 +1,5 @@
+import type { Logger } from "pino";
+
 import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
 import { PublicUser } from "@/users/users.service";
@@ -13,6 +15,7 @@ declare global {
     interface User extends PublicUser {}
 
     interface Request {
+      log: Logger;
       id: string;
       db: Database;
     }

@@ -1,0 +1,27 @@
+# Backend logging
+
+Morgan records HTTP access logs. Pino records application events, including
+startup, shutdown, and failures inside route handlers. Pino writes JSON to stdout.
+
+Set `LOG_LEVEL` in `.env` to `trace`, `debug`, `info` (default), `warn`, `error`,
+`fatal`, or `silent`. Invalid values fail at startup.
+
+Outside a request, import the shared logger:
+
+```ts
+import { logger } from "@/platform/logger";
+
+logger.info({ port: 3000 }, "Server listening");
+```
+
+In a route handler, use `req.log` to include the request ID automatically:
+
+```ts
+req.log.error({ err }, "Operation failed");
+```
+
+Pass errors under `err` so Pino includes their message and stack. Log selected
+fields rather than entire request bodies, headers, user records, or environment
+settings. The logger redacts top-level password, passwordHash, token,
+authorization, and cookie fields; this does not cover arbitrary nested data
+or secrets inside message strings.

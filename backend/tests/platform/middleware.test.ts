@@ -35,4 +35,17 @@ describe("makeRequestIDMiddleware", () => {
 
     expect(res.headers[REQUEST_ID_HEADER.toLowerCase()]).toMatch(/^[0-9a-f-]{36}$/);
   });
+
+  it("binds an isolated logger to each request ID", async () => {
+    const app = express();
+    app.use(makeRequestIDMiddleware());
+    app.get("/", (req, res) => res.json(req.log.bindings()));
+
+    const [first, second] = await Promise.all([
+      request(app).get("/").set(REQUEST_ID_HEADER, "first"),
+      request(app).get("/").set(REQUEST_ID_HEADER, "second"),
+    ]);
+    expect(first.body).toMatchObject({ requestId: "first" });
+    expect(second.body).toMatchObject({ requestId: "second" });
+  });
 });

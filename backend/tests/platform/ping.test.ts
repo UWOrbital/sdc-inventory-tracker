@@ -1,16 +1,17 @@
 import express, { NextFunction, Request, Response } from "express";
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { Database } from "@/platform/database/pool";
+import { makeRequestIDMiddleware } from "@/platform/middleware";
 import { registerHealthPing } from "@/platform/ping";
 
 import { makeTestDB } from "../helpers/db";
 
 function makeApp(db: Database) {
   const app = express();
+  app.use(makeRequestIDMiddleware());
   app.use((req: Request, _: Response, next: NextFunction) => {
-    req.id = "test-request-id";
     req.db = db;
     next();
   });
@@ -37,7 +38,6 @@ describe("GET /", () => {
   });
 
   it("returns 503 when the database is unreachable", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
     const closedDB = makeTestDB();
     await closedDB.$client.end();
 
