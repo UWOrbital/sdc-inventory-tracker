@@ -1,13 +1,14 @@
 import { createApp } from "@/app";
 import { makeDB } from "@/platform/database/pool";
 import { settings } from "@/platform/env/backend.env";
+import { logger } from "@/platform/logger";
 import { shutdown } from "@/platform/setups";
 
 function main() {
   const app = createApp(settings, makeDB(settings));
 
   const server = app.listen(app.locals.settings.general.PORT, () => {
-    console.log(`Server running on port ${app.locals.settings.general.PORT}`);
+    logger.info({ port: app.locals.settings.general.PORT }, "Server listening");
   });
 
   process.once("SIGTERM", () => void shutdown("SIGTERM", server, app));

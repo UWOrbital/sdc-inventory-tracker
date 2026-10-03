@@ -7,6 +7,7 @@ import morgan from "morgan";
 import { LOG_FORMAT, REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
 import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
+import { logger } from "@/platform/logger";
 
 export function makeCORSMiddleware(settings: BackendSettings) {
   return cors({
@@ -21,6 +22,7 @@ export function makeRequestIDMiddleware() {
   return (req: Request, res: Response, next: NextFunction) => {
     const incoming = req.get(REQUEST_ID_HEADER);
     req.id = incoming && VALID_REQUEST_ID.test(incoming) ? incoming : randomUUID();
+    req.log = logger.child({ requestId: req.id });
     res.setHeader(REQUEST_ID_HEADER, req.id);
     next();
   };
