@@ -2,9 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import cors from "cors";
 import { NextFunction, Request, Response } from "express";
-import morgan from "morgan";
+import pinoHttp from "pino-http";
 
-import { LOG_FORMAT, REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
+import { REQUEST_ID_HEADER, VALID_REQUEST_ID } from "@/platform/constants";
 import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
 import { logger } from "@/platform/logger";
@@ -22,7 +22,6 @@ export function makeRequestIDMiddleware() {
   return (req: Request, res: Response, next: NextFunction) => {
     const incoming = req.get(REQUEST_ID_HEADER);
     req.id = incoming && VALID_REQUEST_ID.test(incoming) ? incoming : randomUUID();
-    req.log = logger.child({ requestId: req.id });
     res.setHeader(REQUEST_ID_HEADER, req.id);
     next();
   };
@@ -35,8 +34,20 @@ export function makeDrizzleMiddleware(db: Database) {
   };
 }
 
-morgan.token<Request, Response>("id", (req) => req.id);
-
-export function makeLoggingMiddleware() {
-  return morgan<Request, Response>(LOG_FORMAT);
+export function makeLoggingMiddleware(applicationLogger = logger) {
+  return pinoHttp<Request, Response>({
+    logger: applicationLogger,
+    genReqId: (req) => req.id,
+    quietReqLogger: true,
+    customAttributeKeys: { reqId: "requestId" },
+    customLogLevel: (_req, res, err) => {
+      if (err || res.statusCode >= 500) return "error";
+      return res.statusCode >= 400 ? "warn" : "info";
+    },
+    wrapSerializers: false,
+    serializers: {
+      req: (req: Request) => ({ id: req.id, method: req.method, url: req.url.split("?")[0] }),
+      res: (res: Response) => ({ statusCode: res.statusCode }),
+    },
+  });
 }

@@ -1,17 +1,10 @@
-import "dotenv/config";
-
 import pino from "pino";
-import z from "zod";
 
-const logLevel = z
-  .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
-  .default("info")
-  .parse(process.env.LOG_LEVEL);
+import { generalSettings } from "@/platform/env/general.env";
 
-// Independent of BackendSettings so configuration failures can also be logged.
 export function createLogger(destination?: pino.DestinationStream) {
   const options: pino.LoggerOptions = {
-    level: logLevel,
+    level: generalSettings.LOG_LEVEL,
     timestamp: pino.stdTimeFunctions.isoTime,
     redact: ["password", "passwordHash", "token", "authorization", "cookie"],
   };
