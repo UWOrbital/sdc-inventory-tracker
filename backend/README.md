@@ -1,7 +1,10 @@
 # Backend logging
 
 Morgan records HTTP access logs. Pino records application events, including
-startup, shutdown, and failures inside route handlers. Pino writes JSON to stdout.
+startup, shutdown, and failures inside route handlers. By default, Pino writes
+JSON to stdout for trace/debug/info/warn and stderr for error/fatal, without
+duplicating messages. Default streams write synchronously so logs are written
+before process exit. A custom destination overrides this routing.
 
 Set `LOG_LEVEL` in `.env` to `trace`, `debug`, `info` (default), `warn`, `error`,
 `fatal`, or `silent`. Invalid values fail at startup.
