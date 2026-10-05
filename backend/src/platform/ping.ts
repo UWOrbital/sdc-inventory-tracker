@@ -7,7 +7,7 @@ export function registerHealthPing(app: Express) {
       await req.db.execute(sql`SELECT 1`);
       res.json({ message: "PONG", db: "ok" });
     } catch (err) {
-      console.error(`[${req.id}] Health check DB ping failed`, err);
+      req.log.error({ err }, "Health check DB ping failed");
       res.status(503).json({ message: "PONG", db: "unreachable" });
     }
   });

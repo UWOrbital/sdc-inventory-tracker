@@ -8,6 +8,7 @@ import { registerAuthRoutes } from "@/platform/auth/auth.routes";
 import { registerAuthStrategies } from "@/platform/auth/strategies";
 import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
+import { logger } from "@/platform/logger";
 import {
   makeCORSMiddleware,
   makeDrizzleMiddleware,
@@ -44,17 +45,19 @@ export function setupRoutes(app: Express) {
 }
 
 export async function shutdown(signal: string, server: Server, app: Express) {
-  console.log(`${signal} received, shutting down...`);
+  logger.info({ signal }, "Shutting down");
   try {
     await new Promise<void>((resolve, reject) => {
       server.close((err) => (err ? reject(err) : resolve()));
       server.closeIdleConnections();
     });
     await app.locals.db.$client.end();
-    console.log("Shutdown complete");
+    logger.info("Shutdown complete");
+    logger.flush();
     process.exit(0);
   } catch (err) {
-    console.error("Error during shutdown", err);
+    logger.error({ err }, "Error during shutdown");
+    logger.flush();
     process.exit(1);
   }
 }
