@@ -4,13 +4,10 @@ on:
   pull_request:
     paths:
       - "frontend/**"
-      - ".editorconfig"
       - ".github/workflows/frontend-lint-format.yml"
   push:
-    branches: [main]
     paths:
       - "frontend/**"
-      - ".editorconfig"
       - ".github/workflows/frontend-lint-format.yml"
 
 permissions:
