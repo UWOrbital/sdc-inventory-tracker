@@ -40,3 +40,132 @@ We use [drizzle-kit](https://orm.drizzle.team/docs/kit-overview) to generate SQL
 ## Existing local databases
 
 If you previously set up your local DB with `db:push`, the tables already exist but aren't recorded as migrated, so `db:migrate` will fail on `0000_init`. Simplest fix: drop and recreate the local database, then run `npm run db:migrate`.
+
+# Database Schema
+
+```dbml
+Enum account_status {
+  pending
+  active
+  inactive
+}
+
+Enum account_role {
+  member
+  admin
+  superuser
+}
+
+Enum image_status {
+  pending
+  uploaded
+  failed
+  deleted
+}
+
+table users {
+  id uuid [pk]
+  team_id uuid [not null]
+  avatar_id uuid [not null, unique]
+  status account_status
+  role account_role
+  email text
+  password_hash text
+  name text
+  updated_at timestamptz
+  created_at timestamptz
+}
+
+table teams {
+  id uuid [pk]
+  name text
+  slug text [unique]
+  description text
+  updated_at timestamptz
+  created_at timestamptz
+}
+
+table join_requests {
+  id uuid [pk]
+  user_id uuid [not null, unique]
+  team_id uuid [not null]
+  updated_at timestamptz
+  created_at timestamptz
+}
+
+table items {
+  id uuid [pk]
+  team_id uuid [not null]
+  image_id uuid [not null, unique]
+  created_by uuid [not null]
+  last_updated_by uuid [not null]
+  name text
+  description text
+  count integer
+  updated_at timestamptz
+  created_at timestamptz
+}
+
+table signouts {
+  id uuid [pk]
+  item_id uuid [not null]
+  user_id uuid [not null]
+  quantity integer
+  returned_at timestamptz
+  updated_at timestamptz
+  created_at timestamptz
+}
+
+Table images {
+  id uuid [pk]
+
+  user_id uuid [not null]
+  team_id uuid [not null]
+  bucket_name text [not null]
+  object_key text [not null]
+  etag text
+
+  original_filename text
+  content_type text [not null]
+  size_bytes bigint [not null]
+  checksum_sha256 text
+  width integer
+  height integer
+
+  status image_status [not null]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+  deleted_at timestamptz
+
+  indexes {
+    (bucket_name, object_key) [unique]
+    status
+    created_at
+  }
+}
+
+
+Ref: "teams"."id" < "users"."team_id"
+
+Ref: "join_requests"."user_id" - "users"."id"
+
+Ref: "teams"."id" < "join_requests"."team_id"
+
+Ref: "items"."image_id" - "images"."id"
+
+Ref: "teams"."id" < "items"."team_id"
+
+Ref: "items"."id" < "signouts"."item_id"
+
+Ref: "users"."id" < "signouts"."user_id"
+
+Ref: "users"."avatar_id" - "images"."id"
+
+Ref: "users"."id" < "items"."created_by"
+
+Ref: "users"."id" < "items"."last_updated_by"
+
+Ref: "users"."id" <? "images"."user_id"
+
+Ref: "teams"."id" <? "images"."team_id"
+```
