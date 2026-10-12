@@ -1,0 +1,25 @@
+name: Backend Docker Build
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-docker-build.yml"
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-docker-build.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build --tag sdc-inventory-backend:ci ./backend
