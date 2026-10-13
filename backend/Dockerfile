@@ -1,24 +1,28 @@
 FROM node:22-alpine AS build
 
+RUN corepack enable
+
 WORKDIR /app
 
-COPY package*.json tsconfig*.json ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY shared ./shared
+COPY backend/package.json ./backend/
 
-RUN npm ci
+RUN pnpm install --frozen-lockfile --filter backend...
 
-COPY src ./src
+COPY backend/tsconfig*.json ./backend/
+COPY backend/src ./backend/src
 
-RUN npm run build
+RUN pnpm --filter backend build
+
+RUN pnpm --filter backend deploy --prod --legacy /prod
 
 FROM node:22-alpine AS runtime
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm ci --omit=dev
-
-COPY --from=build /app/dist ./dist
+COPY --from=build /prod ./
+COPY --from=build /app/backend/dist ./dist
 
 EXPOSE 3000
 

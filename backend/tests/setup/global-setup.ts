@@ -13,7 +13,7 @@ declare module "vitest" {
 export default async function setup({ provide }: TestProject) {
   const container = await new PostgreSqlContainer("postgres:18-alpine").start();
 
-  // Apply the committed migrations the same way `npm run db:migrate` does. drizzle.config.ts
+  // Apply the committed migrations the same way `pnpm db:migrate` does. drizzle.config.ts
   // loads .env via dotenv, which never overrides variables that are already set.
   await promisify(execFile)("node_modules/.bin/drizzle-kit", ["migrate"], {
     env: {

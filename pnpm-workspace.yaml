@@ -1,0 +1,13 @@
+packages:
+  - backend
+  - frontend
+  - shared
+
+allowBuilds:
+  cpu-features: true
+  esbuild: true
+  protobufjs: true
+  ssh2: true
+
+overrides:
+  "@esbuild-kit/core-utils>esbuild": ^0.25.0

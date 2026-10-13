@@ -1,7 +1,8 @@
 import { Express, Router } from "express";
 
+import { loginSchema, registerSchema } from "@tracker/shared";
+
 import { login, logout, me, register } from "@/platform/auth/auth.controller";
-import { loginSchema, registerSchema } from "@/platform/auth/auth.validation";
 import { authenticateCredentials, requireAuth } from "@/platform/auth/strategies";
 import { validateBody } from "@/platform/validation";
 
