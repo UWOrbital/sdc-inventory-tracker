@@ -23,6 +23,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@tracker/shared": "workspace:*",
     "@types/pg": "^8.23.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -62,18 +63,5 @@
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.70.1",
     "vitest": "^4.1.11"
-  },
-  "allowScripts": {
-    "fsevents@2.3.3": true,
-    "cpu-features@0.0.10": true,
-    "protobufjs@7.6.6": true,
-    "ssh2@1.17.0": true,
-    "esbuild@0.28.2": true,
-    "esbuild@0.25.12": true
-  },
-  "overrides": {
-    "@esbuild-kit/core-utils": {
-      "esbuild": "^0.25.0"
-    }
   }
 }

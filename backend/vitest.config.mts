@@ -8,6 +8,12 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  // Resolve @tracker/shared to its TypeScript source so tests never run against a stale build.
+  ssr: {
+    resolve: {
+      conditions: ["@tracker/source"],
+    },
+  },
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],

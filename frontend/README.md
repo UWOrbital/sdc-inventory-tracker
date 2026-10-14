@@ -2,21 +2,21 @@
 
 ## Linting and formatting
 
-Run these commands from `frontend/` after installing dependencies with `npm ci`:
+Run these commands from `frontend/` after installing dependencies with `pnpm install` (from anywhere in the repo):
 
 ```sh
-npm run lint          # Check JavaScript, TypeScript, and React rules
-npm run lint:fix      # Apply available automatic lint fixes
-npm run format       # Format frontend source, configuration, and documentation
-npm run format:check # Check formatting without modifying files
+pnpm lint         # Check JavaScript, TypeScript, and React rules
+pnpm lint:fix     # Apply available automatic lint fixes
+pnpm format       # Format frontend source, configuration, and documentation
+pnpm format:check # Check formatting without modifying files
 ```
 
-From the repository root, use `npm --prefix frontend run <script>` instead.
+From the repository root, use `pnpm --filter frontend <script>` instead.
 
 Prettier reads indentation and line endings from the root `.editorconfig` (two
 spaces and LF). The frontend Prettier config matches the backend's basic style:
 semicolons, double quotes, trailing commas, and a 100-character print width.
-Generated output, dependencies, the npm lockfile, and static assets are excluded
+Generated output, dependencies, and static assets are excluded
 from formatting. ESLint retains the React Hooks and Fast Refresh checks, and
 `eslint-config-prettier` disables rules that could conflict with formatting.
 

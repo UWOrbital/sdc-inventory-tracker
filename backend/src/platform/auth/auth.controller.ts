@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
-import { RegisterBody } from "@/platform/auth/auth.validation";
+import type { RegisterBody } from "@tracker/shared";
+
 import { hashPassword } from "@/platform/auth/password";
 import { clearAuthCookie, setAuthCookie, signAccessToken } from "@/platform/auth/tokens";
 import { createUser, toPublicUser } from "@/users/users.service";

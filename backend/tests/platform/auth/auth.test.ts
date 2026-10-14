@@ -3,10 +3,11 @@ import jwt from "jsonwebtoken";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { authResponseSchema, type AuthResponse } from "@tracker/shared";
+
 import { AUTH_COOKIE_NAME } from "@/platform/constants";
 import { Database } from "@/platform/database/pool";
 import { user } from "@/users/users.schema";
-import { PublicUser } from "@/users/users.service";
 
 import { makeTestApp, TEST_JWT_SECRET } from "../../helpers/app";
 import { makeTestDB, resetDB } from "../../helpers/db";
@@ -15,7 +16,13 @@ const credentials = { email: "Alice@Example.com", password: "password123", name:
 
 // Supertest types response bodies as `any`.
 function bodyOf(res: request.Response) {
-  return res.body as { user: PublicUser; error?: string };
+  return res.body as Partial<AuthResponse> & { error?: string };
+}
+
+// Fails if the response drifts from the shared contract the frontend relies on.
+function expectAuthResponse(res: request.Response) {
+  expect(authResponseSchema.safeParse(res.body).error).toBeUndefined();
+  return res.body as AuthResponse;
 }
 
 function authCookie(res: request.Response) {
@@ -54,7 +61,10 @@ describe("auth", () => {
     it("creates the user, hashes the password, and sets an httpOnly auth cookie", async () => {
       const res = await registerUser();
 
-      expect(bodyOf(res).user).toMatchObject({ email: "alice@example.com", name: "Alice" });
+      expect(expectAuthResponse(res).user).toMatchObject({
+        email: "alice@example.com",
+        name: "Alice",
+      });
       expect(bodyOf(res).user).not.toHaveProperty("passwordHash");
 
       const cookie = authCookie(res);
@@ -98,7 +108,7 @@ describe("auth", () => {
         .send({ email: "alice@example.com", password: credentials.password });
 
       expect(res.status).toBe(200);
-      expect(bodyOf(res).user).toMatchObject({ email: "alice@example.com" });
+      expect(expectAuthResponse(res).user).toMatchObject({ email: "alice@example.com" });
       expect(bodyOf(res).user).not.toHaveProperty("passwordHash");
       expect(authCookie(res)).toBeDefined();
     });
@@ -129,7 +139,10 @@ describe("auth", () => {
       const res = await agent.get("/auth/me");
 
       expect(res.status).toBe(200);
-      expect(bodyOf(res).user).toMatchObject({ email: "alice@example.com", name: "Alice" });
+      expect(expectAuthResponse(res).user).toMatchObject({
+        email: "alice@example.com",
+        name: "Alice",
+      });
       expect(bodyOf(res).user).not.toHaveProperty("passwordHash");
     });
 
@@ -158,7 +171,7 @@ describe("auth", () => {
     it("rejects a token signed with a different secret", async () => {
       const res = await registerUser();
       const token = jwt.sign({}, "a-different-secret-that-is-also-32-chars", {
-        subject: bodyOf(res).user.id,
+        subject: expectAuthResponse(res).user.id,
       });
 
       const me = await request(app).get("/auth/me").set("Cookie", tokenCookie(token));
@@ -169,7 +182,7 @@ describe("auth", () => {
     it("rejects an expired token", async () => {
       const res = await registerUser();
       const token = jwt.sign({ exp: Math.floor(Date.now() / 1000) - 60 }, TEST_JWT_SECRET, {
-        subject: bodyOf(res).user.id,
+        subject: expectAuthResponse(res).user.id,
       });
 
       const me = await request(app).get("/auth/me").set("Cookie", tokenCookie(token));
@@ -179,7 +192,10 @@ describe("auth", () => {
 
     it("rejects an unsigned token", async () => {
       const res = await registerUser();
-      const token = jwt.sign({}, "", { algorithm: "none", subject: bodyOf(res).user.id });
+      const token = jwt.sign({}, "", {
+        algorithm: "none",
+        subject: expectAuthResponse(res).user.id,
+      });
 
       const me = await request(app).get("/auth/me").set("Cookie", tokenCookie(token));
 
