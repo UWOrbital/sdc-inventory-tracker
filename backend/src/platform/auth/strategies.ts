@@ -58,6 +58,10 @@ function authenticate(strategy: "local" | "jwt", message: string) {
       (err: unknown, user: Express.User | false | undefined) => {
         if (err) return next(err);
         if (!user) return res.status(401).json({ error: message });
+        if (!user.active)
+          return res
+            .status(403)
+            .json({ error: "Account is deactivated. Contact admins to reactivate account." });
         req.user = user;
         next();
       },
