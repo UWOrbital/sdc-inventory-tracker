@@ -18,6 +18,7 @@ export default defineConfig({
     environment: "node",
     include: ["tests/**/*.test.ts"],
     globalSetup: ["tests/setup/global-setup.ts"],
+    fileParallelism: false,
     restoreMocks: true,
   },
 });
