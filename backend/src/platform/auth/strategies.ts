@@ -1,7 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import passport from "passport";
 import { Strategy as JwtStrategy } from "passport-jwt";
 import { Strategy as LocalStrategy } from "passport-local";
+
+import { UserRole } from "@tracker/shared";
 
 import { getDummyHash, verifyPassword } from "@/platform/auth/password";
 import { AUTH_COOKIE_NAME, JWT_ALGORITHM } from "@/platform/constants";
@@ -72,3 +74,16 @@ function authenticate(strategy: "local" | "jwt", message: string) {
 
 export const authenticateCredentials = authenticate("local", "Invalid email or password");
 export const requireAuth = authenticate("jwt", "Unauthorized");
+export const requireRole =
+  (...allowed: UserRole[]): RequestHandler =>
+  (req, res, next) => {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    if (!allowed.includes(req.user.role)) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+    next();
+  };

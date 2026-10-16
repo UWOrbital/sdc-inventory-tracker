@@ -64,6 +64,7 @@ describe("auth", () => {
       expect(expectAuthResponse(res).user).toMatchObject({
         email: "alice@example.com",
         name: "Alice",
+        role: "member",
       });
       expect(bodyOf(res).user).not.toHaveProperty("passwordHash");
 
@@ -74,6 +75,7 @@ describe("auth", () => {
       const [stored] = await db.select().from(user).where(eq(user.email, "alice@example.com"));
       expect(stored.passwordHash).toMatch(/^scrypt\$/);
       expect(stored.passwordHash).not.toContain(credentials.password);
+      expect(stored).toMatchObject({ role: "member", active: true });
     });
 
     it("rejects an email that is already registered, ignoring case", async () => {
@@ -210,6 +212,67 @@ describe("auth", () => {
       const res = await agent.get("/auth/me");
 
       expect(res.status).toBe(401);
+    });
+  });
+
+  describe("deactivated accounts", () => {
+    const deactivatedError = {
+      error: "Account is deactivated. Contact admins to reactivate account.",
+    };
+
+    async function setActive(active: boolean) {
+      await db.update(user).set({ active }).where(eq(user.email, "alice@example.com"));
+    }
+
+    it("rejects login with 403 and sets no cookie", async () => {
+      await registerUser();
+      await setActive(false);
+
+      const res = await request(app)
+        .post("/auth/login")
+        .send({ email: "alice@example.com", password: credentials.password });
+
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual(deactivatedError);
+      expect(authCookie(res)).toBeUndefined();
+    });
+
+    it("returns 401, not 403, for a wrong password so deactivation is not revealed", async () => {
+      await registerUser();
+      await setActive(false);
+
+      const res = await request(app)
+        .post("/auth/login")
+        .send({ email: "alice@example.com", password: "wrong-password" });
+
+      expect(res.status).toBe(401);
+      expect(res.body).toEqual({ error: "Invalid email or password" });
+    });
+
+    it("rejects an existing session once the account is deactivated", async () => {
+      const agent = request.agent(app);
+      await agent.post("/auth/register").send(credentials).expect(201);
+      await setActive(false);
+
+      const res = await agent.get("/auth/me");
+
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual(deactivatedError);
+    });
+
+    it("restores access when the account is reactivated", async () => {
+      const agent = request.agent(app);
+      await agent.post("/auth/register").send(credentials).expect(201);
+      await setActive(false);
+      await agent.get("/auth/me").expect(403);
+
+      await setActive(true);
+
+      await agent.get("/auth/me").expect(200);
+      await request(app)
+        .post("/auth/login")
+        .send({ email: "alice@example.com", password: credentials.password })
+        .expect(200);
     });
   });
 

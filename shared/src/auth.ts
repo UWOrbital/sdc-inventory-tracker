@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userRoleSchema } from "./roles";
 
 // Request bodies
 
@@ -25,6 +26,7 @@ export const publicUserSchema = z.object({
   id: z.uuid(),
   email: z.email(),
   name: z.string().nullable(),
+  role: userRoleSchema,
   createdAt: z.iso.datetime({ offset: true }),
 });
 
