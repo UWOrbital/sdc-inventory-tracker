@@ -25,7 +25,7 @@ This links `@tracker/shared` into both apps and builds `shared/dist` (via its `p
    export type CreateItemBody = z.output<typeof createItemSchema>; // what the handler receives
    ```
 
-   Response schemas describe the JSON on the wire, so dates are ISO strings (`z.iso.datetime()`), not `Date`.
+   Response schemas map the JSON on the wire to app types: dates use a codec (ISO string in, `Date` out). Export response types with `z.input` (the wire shape). The backend builds a response with `schema.encode(value)`, which also drops any keys the schema doesn't list (e.g. `passwordHash`), so no hand-written serializer is needed.
 
 2. Validate requests with the schema in the backend:
 

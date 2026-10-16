@@ -3,15 +3,8 @@ import { eq } from "drizzle-orm";
 import { Database } from "@/platform/database/pool";
 import { user } from "@/users/users.schema";
 
-export type User = typeof user.$inferSelect;
-export type PublicUser = Omit<User, "passwordHash">;
-
 export function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
-}
-
-export function toPublicUser({ passwordHash: _, ...rest }: User): PublicUser {
-  return rest;
 }
 
 export async function findUserByEmail(db: Database, email: string) {

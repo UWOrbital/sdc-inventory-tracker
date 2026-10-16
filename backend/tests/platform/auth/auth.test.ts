@@ -133,12 +133,12 @@ describe("auth", () => {
     });
   });
 
-  describe("GET /auth/me", () => {
+  describe("GET /users/me", () => {
     it("returns the current user when the auth cookie is valid", async () => {
       const agent = request.agent(app);
       await agent.post("/auth/register").send(credentials).expect(201);
 
-      const res = await agent.get("/auth/me");
+      const res = await agent.get("/users/me");
 
       expect(res.status).toBe(200);
       expect(expectAuthResponse(res).user).toMatchObject({
@@ -146,10 +146,11 @@ describe("auth", () => {
         name: "Alice",
       });
       expect(bodyOf(res).user).not.toHaveProperty("passwordHash");
+      expect(bodyOf(res).user).not.toHaveProperty("active");
     });
 
     it("returns 401 without an auth cookie", async () => {
-      const res = await request(app).get("/auth/me");
+      const res = await request(app).get("/users/me");
 
       expect(res.status).toBe(401);
       expect(res.body).toEqual({ error: "Unauthorized" });
@@ -164,7 +165,7 @@ describe("auth", () => {
       );
 
       const me = await request(app)
-        .get("/auth/me")
+        .get("/users/me")
         .set("Cookie", tokenCookie(`${header}.${forgedPayload}.${signature}`));
 
       expect(me.status).toBe(401);
@@ -176,7 +177,7 @@ describe("auth", () => {
         subject: expectAuthResponse(res).user.id,
       });
 
-      const me = await request(app).get("/auth/me").set("Cookie", tokenCookie(token));
+      const me = await request(app).get("/users/me").set("Cookie", tokenCookie(token));
 
       expect(me.status).toBe(401);
     });
@@ -187,7 +188,7 @@ describe("auth", () => {
         subject: expectAuthResponse(res).user.id,
       });
 
-      const me = await request(app).get("/auth/me").set("Cookie", tokenCookie(token));
+      const me = await request(app).get("/users/me").set("Cookie", tokenCookie(token));
 
       expect(me.status).toBe(401);
     });
@@ -199,7 +200,7 @@ describe("auth", () => {
         subject: expectAuthResponse(res).user.id,
       });
 
-      const me = await request(app).get("/auth/me").set("Cookie", tokenCookie(token));
+      const me = await request(app).get("/users/me").set("Cookie", tokenCookie(token));
 
       expect(me.status).toBe(401);
     });
@@ -209,7 +210,7 @@ describe("auth", () => {
       await agent.post("/auth/register").send(credentials).expect(201);
       await resetDB(db);
 
-      const res = await agent.get("/auth/me");
+      const res = await agent.get("/users/me");
 
       expect(res.status).toBe(401);
     });
@@ -254,7 +255,7 @@ describe("auth", () => {
       await agent.post("/auth/register").send(credentials).expect(201);
       await setActive(false);
 
-      const res = await agent.get("/auth/me");
+      const res = await agent.get("/users/me");
 
       expect(res.status).toBe(403);
       expect(res.body).toEqual(deactivatedError);
@@ -264,11 +265,11 @@ describe("auth", () => {
       const agent = request.agent(app);
       await agent.post("/auth/register").send(credentials).expect(201);
       await setActive(false);
-      await agent.get("/auth/me").expect(403);
+      await agent.get("/users/me").expect(403);
 
       await setActive(true);
 
-      await agent.get("/auth/me").expect(200);
+      await agent.get("/users/me").expect(200);
       await request(app)
         .post("/auth/login")
         .send({ email: "alice@example.com", password: credentials.password })
@@ -285,7 +286,7 @@ describe("auth", () => {
 
       expect(res.status).toBe(204);
       expect(authCookie(res)).toMatch(/Expires=Thu, 01 Jan 1970/);
-      await agent.get("/auth/me").expect(401);
+      await agent.get("/users/me").expect(401);
     });
   });
 });
