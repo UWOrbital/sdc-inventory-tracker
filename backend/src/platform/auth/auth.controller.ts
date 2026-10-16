@@ -13,7 +13,7 @@ export async function register(req: Request<object, object, RegisterBody>, res: 
   const created = await createUser(req.db, {
     email,
     name,
-    passwordHash: await hashPassword(password),
+    password: await hashPassword(password),
   });
   if (!created) {
     return res.status(409).json({ error: "Email is already registered" });

@@ -15,9 +15,6 @@ export function validateBody<S extends z.ZodType>(schema: S) {
   };
 }
 
-// Express has no post-handler hook, so this must run before the handler: it wraps
-// res.json so successful bodies are encoded to the wire format (dropping unlisted keys
-// like passwordHash). Error bodies (non-2xx) pass through as-is.
 export function encodeResponse<S extends z.ZodType>(schema: S) {
   return (_req: Request, res: Response, next: NextFunction) => {
     const json = res.json.bind(res);
