@@ -1,9 +1,9 @@
 import { Express, Router } from "express";
 
-import { userListSchema, userPatchSchema, userSchema } from "@tracker/shared";
+import { idParamSchema, userListSchema, userPatchSchema, userSchema } from "@tracker/shared";
 
 import { requireAuth, requireRole } from "@/platform/auth/strategies";
-import { encodeResponse, validateBody } from "@/platform/validation";
+import { encodeResponse, validateBody, validateParams } from "@/platform/validation";
 import {
   activateUser,
   deactivateMe,
@@ -24,9 +24,19 @@ export function registerUserRoutes(app: Express) {
   router.delete("/me", deactivateMe);
 
   router.get("/", requireRole("superuser"), encodeResponse(userListSchema), getAllUsers);
-  router.delete("/:id", requireRole("superuser"), deleteUser);
-  router.post("/:id/activate", requireRole("superuser"), activateUser);
-  router.post("/:id/deactivate", requireRole("superuser"), deactivateUser);
+  router.delete("/:id", requireRole("superuser"), validateParams(idParamSchema), deleteUser);
+  router.post(
+    "/:id/activate",
+    requireRole("superuser"),
+    validateParams(idParamSchema),
+    activateUser,
+  );
+  router.post(
+    "/:id/deactivate",
+    requireRole("superuser"),
+    validateParams(idParamSchema),
+    deactivateUser,
+  );
 
   app.use("/users", router);
 }

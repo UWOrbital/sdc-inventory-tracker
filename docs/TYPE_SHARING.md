@@ -38,13 +38,13 @@ This links `@tracker/shared` into both apps and builds `shared/dist` (via its `p
 3. Use the types in the frontend, and optionally the schemas for form validation or for checking responses:
 
    ```ts
-   import { authResponseSchema, type RegisterRequest } from "@tracker/shared";
+   import { userSchema, type RegisterRequest } from "@tracker/shared";
 
    const body: RegisterRequest = { email, password };
-   const { user } = authResponseSchema.parse(await res.json());
+   const user = userSchema.parse(await res.json());
    ```
 
-4. In backend tests, assert that responses match the shared response schema (see `expectAuthResponse` in `backend/tests/platform/auth/auth.test.ts`) so the API can't drift from what the frontend expects.
+4. In backend tests, assert that responses match the shared response schema (see `expectUserResponse` in `backend/tests/users/users.test.ts`) so the API can't drift from what the frontend expects.
 
 ## How each side resolves `@tracker/shared`
 

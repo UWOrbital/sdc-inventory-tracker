@@ -13,20 +13,20 @@ export async function register(req: Request<object, object, RegisterBody>, res: 
   const created = await createUser(req.db, {
     email,
     name,
-    password: await hashPassword(password),
+    passwordHash: await hashPassword(password),
   });
   if (!created) {
     return res.status(409).json({ error: "Email is already registered" });
   }
 
   setAuthCookie(res, signAccessToken(created.id, settings), settings);
-  res.status(201).json({ user: created });
+  res.status(201).json(created);
 }
 
 export function login(req: Request, res: Response) {
   const settings = req.app.locals.settings.auth;
   setAuthCookie(res, signAccessToken(req.user!.id, settings), settings);
-  res.json({ user: req.user });
+  res.json(req.user);
 }
 
 export function logout(req: Request, res: Response) {
