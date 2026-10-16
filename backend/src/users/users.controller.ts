@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 
-import { authResponseSchema } from "@tracker/shared";
-
 import { IdPathParam } from "@/platform/types/params";
 
 export async function getMe(req: Request, res: Response) {
-  res.json(authResponseSchema.encode({ user: req.user! }));
+  res.json({ user: req.user });
 }
 
 export async function patchMe(req: Request, res: Response) {}

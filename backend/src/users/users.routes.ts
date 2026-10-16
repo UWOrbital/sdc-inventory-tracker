@@ -1,6 +1,9 @@
 import { Express, Router } from "express";
 
+import { authResponseSchema } from "@tracker/shared";
+
 import { requireAuth, requireRole } from "@/platform/auth/strategies";
+import { encodeResponse } from "@/platform/validation";
 import { deactivateMe, deleteUser, getAllUsers, getMe, patchMe } from "@/users/users.controller";
 
 export function registerUserRoutes(app: Express) {
@@ -8,7 +11,7 @@ export function registerUserRoutes(app: Express) {
 
   router.use(requireAuth);
 
-  router.get("/me", getMe);
+  router.get("/me", encodeResponse(authResponseSchema), getMe);
   router.patch("/me", patchMe);
   router.delete("/me", deactivateMe);
 

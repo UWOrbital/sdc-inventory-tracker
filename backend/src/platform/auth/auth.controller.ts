@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { authResponseSchema, type RegisterBody } from "@tracker/shared";
+import type { RegisterBody } from "@tracker/shared";
 
 import { hashPassword } from "@/platform/auth/password";
 import { clearAuthCookie, setAuthCookie, signAccessToken } from "@/platform/auth/tokens";
@@ -20,13 +20,13 @@ export async function register(req: Request<object, object, RegisterBody>, res: 
   }
 
   setAuthCookie(res, signAccessToken(created.id, settings), settings);
-  res.status(201).json(authResponseSchema.encode({ user: created }));
+  res.status(201).json({ user: created });
 }
 
 export function login(req: Request, res: Response) {
   const settings = req.app.locals.settings.auth;
   setAuthCookie(res, signAccessToken(req.user!.id, settings), settings);
-  res.json(authResponseSchema.encode({ user: req.user! }));
+  res.json({ user: req.user });
 }
 
 export function logout(req: Request, res: Response) {
