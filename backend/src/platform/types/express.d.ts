@@ -2,7 +2,7 @@ import type { Logger } from "pino";
 
 import { Database } from "@/platform/database/pool";
 import { BackendSettings } from "@/platform/env/backend.env";
-import { PublicUser } from "@/users/users.service";
+import { User as DbUser } from "@/users/users.schema";
 
 declare global {
   namespace Express {
@@ -12,7 +12,7 @@ declare global {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface User extends PublicUser {}
+    interface User extends DbUser {}
 
     interface Request {
       log: Logger;
