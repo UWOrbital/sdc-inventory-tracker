@@ -16,6 +16,7 @@ import {
   makeRequestIDMiddleware,
 } from "@/platform/middleware";
 import { registerHealthPing } from "@/platform/ping";
+import { registerUserRoutes } from "@/users/users.routes";
 
 export function setupEnvSettings(app: Express, settings: BackendSettings) {
   app.locals.settings = settings;
@@ -42,6 +43,7 @@ export function setupAuth(app: Express) {
 export function setupRoutes(app: Express) {
   registerHealthPing(app);
   registerAuthRoutes(app);
+  registerUserRoutes(app);
 }
 
 export async function shutdown(signal: string, server: Server, app: Express) {

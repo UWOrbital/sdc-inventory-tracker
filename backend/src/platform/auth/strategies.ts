@@ -7,7 +7,8 @@ import { UserRole } from "@tracker/shared";
 
 import { getDummyHash, verifyPassword } from "@/platform/auth/password";
 import { AUTH_COOKIE_NAME, JWT_ALGORITHM } from "@/platform/constants";
-import { findUserByEmail, findUserById, toPublicUser } from "@/users/users.service";
+import { ParamsDictionary } from "@/platform/types/params";
+import { getUserByEmail, getUserById } from "@/users/users.service";
 
 function cookieExtractor(req: Request): string | null {
   const token: unknown = req.cookies?.[AUTH_COOKIE_NAME];
@@ -20,12 +21,12 @@ export function registerAuthStrategies() {
       { usernameField: "email", passReqToCallback: true, session: false },
       (req, email, password, done) => {
         void (async () => {
-          const found = await findUserByEmail(req.db, email);
+          const found = await getUserByEmail(req.db, email);
           const valid = await verifyPassword(
             password,
             found?.passwordHash ?? (await getDummyHash()),
           );
-          return found?.passwordHash && valid ? toPublicUser(found) : false;
+          return found?.passwordHash && valid ? found : false;
         })().then((user) => done(null, user), done);
       },
     ),
@@ -43,10 +44,7 @@ export function registerAuthStrategies() {
       },
       (req: Request, payload: { sub?: string }, done) => {
         if (!payload.sub) return done(null, false);
-        findUserById(req.db, payload.sub).then(
-          (found) => done(null, found ? toPublicUser(found) : false),
-          done,
-        );
+        getUserById(req.db, payload.sub).then((found) => done(null, found ?? false), done);
       },
     ),
   );
@@ -75,7 +73,7 @@ function authenticate(strategy: "local" | "jwt", message: string) {
 export const authenticateCredentials = authenticate("local", "Invalid email or password");
 export const requireAuth = authenticate("jwt", "Unauthorized");
 export const requireRole =
-  (...allowed: UserRole[]): RequestHandler =>
+  <P = ParamsDictionary>(...allowed: UserRole[]): RequestHandler<P> =>
   (req, res, next) => {
     if (!req.user) {
       res.status(401).json({ error: "Unauthorized" });

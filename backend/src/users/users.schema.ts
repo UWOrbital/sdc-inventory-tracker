@@ -2,7 +2,7 @@ import { boolean, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-
 
 import { USER_ROLES } from "@tracker/shared";
 
-export const userRole = pgEnum("user_role", USER_ROLES);
+const userRole = pgEnum("user_role", USER_ROLES);
 
 export const user = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -13,3 +13,5 @@ export const user = pgTable("users", {
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export type User = typeof user.$inferSelect;

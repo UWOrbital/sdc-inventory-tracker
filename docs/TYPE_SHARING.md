@@ -25,7 +25,7 @@ This links `@tracker/shared` into both apps and builds `shared/dist` (via its `p
    export type CreateItemBody = z.output<typeof createItemSchema>; // what the handler receives
    ```
 
-   Response schemas describe the JSON on the wire, so dates are ISO strings (`z.iso.datetime()`), not `Date`.
+   Response schemas map the JSON on the wire to app types: dates use a codec (ISO string in, `Date` out). Export response types with `z.input` (the wire shape). The backend builds a response with `schema.encode(value)`, which also drops any keys the schema doesn't list (e.g. `passwordHash`), so no hand-written serializer is needed.
 
 2. Validate requests with the schema in the backend:
 
@@ -38,13 +38,13 @@ This links `@tracker/shared` into both apps and builds `shared/dist` (via its `p
 3. Use the types in the frontend, and optionally the schemas for form validation or for checking responses:
 
    ```ts
-   import { authResponseSchema, type RegisterRequest } from "@tracker/shared";
+   import { userSchema, type RegisterRequest } from "@tracker/shared";
 
    const body: RegisterRequest = { email, password };
-   const { user } = authResponseSchema.parse(await res.json());
+   const user = userSchema.parse(await res.json());
    ```
 
-4. In backend tests, assert that responses match the shared response schema (see `expectAuthResponse` in `backend/tests/platform/auth/auth.test.ts`) so the API can't drift from what the frontend expects.
+4. In backend tests, assert that responses match the shared response schema (see `expectUserResponse` in `backend/tests/users/users.test.ts`) so the API can't drift from what the frontend expects.
 
 ## How each side resolves `@tracker/shared`
 

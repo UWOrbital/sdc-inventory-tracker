@@ -1,18 +1,23 @@
 import { Express, Router } from "express";
 
-import { loginSchema, registerSchema } from "@tracker/shared";
+import { loginSchema, registerSchema, userSchema } from "@tracker/shared";
 
-import { login, logout, me, register } from "@/platform/auth/auth.controller";
-import { authenticateCredentials, requireAuth } from "@/platform/auth/strategies";
-import { validateBody } from "@/platform/validation";
+import { login, logout, register } from "@/platform/auth/auth.controller";
+import { authenticateCredentials } from "@/platform/auth/strategies";
+import { encodeResponse, validateBody } from "@/platform/validation";
 
 export function registerAuthRoutes(app: Express) {
   const router = Router();
 
-  router.post("/register", validateBody(registerSchema), register);
-  router.post("/login", validateBody(loginSchema), authenticateCredentials, login);
+  router.post("/register", validateBody(registerSchema), encodeResponse(userSchema), register);
+  router.post(
+    "/login",
+    validateBody(loginSchema),
+    authenticateCredentials,
+    encodeResponse(userSchema),
+    login,
+  );
   router.post("/logout", logout);
-  router.get("/me", requireAuth, me);
 
   app.use("/auth", router);
 }
