@@ -4,19 +4,25 @@ import type { RegisterBody } from "@tracker/shared";
 
 import { hashPassword } from "@/platform/auth/password";
 import { clearAuthCookie, setAuthCookie, signAccessToken } from "@/platform/auth/tokens";
-import { createUser } from "@/users/users.service";
+import { isUniqueViolation } from "@/platform/database/abstract-repository";
+import { UserRepository } from "@/users/users.service";
 
 export async function register(req: Request<object, object, RegisterBody>, res: Response) {
   const { email, password, name } = req.body;
   const settings = req.app.locals.settings.auth;
 
-  const created = await createUser(req.db, {
-    email,
-    name,
-    passwordHash: await hashPassword(password),
-  });
-  if (!created) {
-    return res.status(409).json({ error: "Email is already registered" });
+  let created;
+  try {
+    created = await new UserRepository(req.db).create({
+      email,
+      name,
+      passwordHash: await hashPassword(password),
+    });
+  } catch (err) {
+    if (isUniqueViolation(err)) {
+      return res.status(409).json({ error: "Email is already registered" });
+    }
+    throw err;
   }
 
   setAuthCookie(res, signAccessToken(created.id, settings), settings);

@@ -1,5 +1,7 @@
-import { and, eq, getTableColumns, isNull, SQL } from "drizzle-orm";
+import { and, DrizzleQueryError, eq, getTableColumns, isNull, SQL } from "drizzle-orm";
 import { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
+import { DatabaseError } from "pg";
+import { PostgresError } from "pg-error-enum";
 
 import { Database } from "@/platform/database/pool";
 
@@ -7,6 +9,16 @@ type PgTableWithId = PgTable & { id: AnyPgColumn };
 type Row<T extends PgTableWithId> = T["$inferSelect"];
 type NewRow<T extends PgTableWithId> = T["$inferInsert"];
 type Id<T extends PgTableWithId> = Row<T>["id"];
+
+export class NotFoundError extends Error {}
+
+export function isUniqueViolation(err: unknown) {
+  return (
+    err instanceof DrizzleQueryError &&
+    err.cause instanceof DatabaseError &&
+    err.cause.code === PostgresError.UNIQUE_VIOLATION
+  );
+}
 
 export default abstract class AbstractRepository<T extends PgTableWithId> {
   protected abstract readonly table: T;
@@ -51,7 +63,7 @@ export default abstract class AbstractRepository<T extends PgTableWithId> {
 
   async getById(id: Id<T>) {
     const row = await this.getFirstBy({ id });
-    if (!row) throw new Error(`${this.name} with ID ${String(id)} not found.`);
+    if (!row) throw new NotFoundError(`${this.name} with ID ${String(id)} not found.`);
     return row;
   }
 
@@ -62,7 +74,7 @@ export default abstract class AbstractRepository<T extends PgTableWithId> {
 
   async deleteById(id: Id<T>) {
     const [row] = await this.db.delete(this.table).where(eq(this.table.id, id)).returning();
-    if (!row) throw new Error(`${this.name} with ID ${String(id)} not found.`);
+    if (!row) throw new NotFoundError(`${this.name} with ID ${String(id)} not found.`);
     return row as Row<T>;
   }
 
@@ -79,7 +91,7 @@ export default abstract class AbstractRepository<T extends PgTableWithId> {
       .set(data)
       .where(eq(this.table.id, id))
       .returning();
-    if (!row) throw new Error(`${this.name} with ID ${String(id)} not found.`);
+    if (!row) throw new NotFoundError(`${this.name} with ID ${String(id)} not found.`);
     return row as Row<T>;
   }
 }
