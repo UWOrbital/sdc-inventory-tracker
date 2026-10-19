@@ -7,10 +7,6 @@ import { user } from "@/users/users.schema";
 
 const UNIQUE_VIOLATION = "23505";
 
-export function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
-}
-
 // Drizzle wraps driver errors, so the pg error code lives on `cause`.
 function isUniqueViolation(err: unknown) {
   return (
@@ -24,10 +20,7 @@ export async function getUserList(db: Database) {
 }
 
 export async function getUserByEmail(db: Database, email: string) {
-  const [found] = await db
-    .select()
-    .from(user)
-    .where(eq(user.email, normalizeEmail(email)));
+  const [found] = await db.select().from(user).where(eq(user.email, email));
   return found;
 }
 
@@ -43,7 +36,7 @@ export async function createUser(
 ) {
   const [created] = await db
     .insert(user)
-    .values({ ...values, email: normalizeEmail(values.email) })
+    .values(values)
     .onConflictDoNothing({ target: user.email })
     .returning();
   return created;
@@ -51,11 +44,10 @@ export async function createUser(
 
 // Returns null when the email is already taken, undefined when the user doesn't exist.
 export async function updateUserById(db: Database, id: string, values: UserPatchBody) {
-  const changes = { ...values, ...(values.email && { email: normalizeEmail(values.email) }) };
-  if (Object.keys(changes).length === 0) return getUserById(db, id);
+  if (Object.keys(values).length === 0) return getUserById(db, id);
 
   try {
-    const [updated] = await db.update(user).set(changes).where(eq(user.id, id)).returning();
+    const [updated] = await db.update(user).set(values).where(eq(user.id, id)).returning();
     return updated;
   } catch (err) {
     if (isUniqueViolation(err)) return null;
