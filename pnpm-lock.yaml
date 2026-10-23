@@ -49,6 +49,9 @@ importers:
       pg:
         specifier: ^8.23.0
         version: 8.23.1
+      pg-error-enum:
+        specifier: ^2.0.1
+        version: 2.0.1
       pino:
         specifier: ^10.4.0
         version: 10.4.0
@@ -2731,6 +2734,10 @@ packages:
 
   pg-connection-string@2.14.1:
     resolution: {integrity: sha512-qR3kGNPBLpCNtz0evbKA0Y/MRFXwSSdT+pTJvYp/bXTcReZbvX1kzF0IyTc1QnxqF7AZbOeBhNL8R5mYQZV/MA==}
+
+  pg-error-enum@2.0.1:
+    resolution: {integrity: sha512-j6V7AadTAEDIKmc4n33tcJ8+8ScwDvBGUr8q4SUDjmDWUZF8iFyHYJ9Lz9yRYZ/Ajv9v7tdVOKuN7a87GfndKQ==}
+    engines: {node: ^22.12.0 || >24.0.0}
 
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
@@ -5889,6 +5896,8 @@ snapshots:
     optional: true
 
   pg-connection-string@2.14.1: {}
+
+  pg-error-enum@2.0.1: {}
 
   pg-int8@1.0.1: {}
 

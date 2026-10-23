@@ -86,34 +86,19 @@ describe("users", () => {
   });
 
   describe("PATCH /users/me", () => {
-    it("updates the name and email, normalizing the email", async () => {
+    it("updates the name", async () => {
       const { agent, id } = await signUp("alice@example.com", "member", "Alice");
 
-      const res = await agent
-        .patch("/users/me")
-        .send({ name: "  Alicia  ", email: "Alicia@Example.com" });
+      const res = await agent.patch("/users/me").send({ name: "  Alicia  " });
 
       expect(res.status).toBe(200);
       expect(expectUserResponse(res)).toMatchObject({
         id,
         name: "Alicia",
-        email: "alicia@example.com",
+        email: "alice@example.com",
       });
       expect(res.body).not.toHaveProperty("passwordHash");
-      expect(await findStored(id)).toMatchObject({
-        name: "Alicia",
-        email: "alicia@example.com",
-      });
-    });
-
-    it("leaves fields that aren't sent unchanged", async () => {
-      const { agent, id } = await signUp("alice@example.com", "member", "Alice");
-
-      const res = await agent.patch("/users/me").send({ name: "Alicia" });
-
-      expect(res.status).toBe(200);
-      expect(expectUserResponse(res)).toMatchObject({ email: "alice@example.com" });
-      expect(await findStored(id)).toMatchObject({ email: "alice@example.com", name: "Alicia" });
+      expect(await findStored(id)).toMatchObject({ name: "Alicia", email: "alice@example.com" });
     });
 
     it("returns the current user unchanged for an empty body", async () => {
@@ -125,44 +110,23 @@ describe("users", () => {
       expect(expectUserResponse(res)).toMatchObject({ email: "alice@example.com", name: "Alice" });
     });
 
-    it("ignores attempts to change role, active, or password", async () => {
+    it("ignores attempts to change email, role, active, or password", async () => {
       const { agent, id } = await signUp("alice@example.com");
       const before = await findStored(id);
 
-      const res = await agent
-        .patch("/users/me")
-        .send({ role: "superuser", active: false, passwordHash: "x", password: "newpassword" });
+      const res = await agent.patch("/users/me").send({
+        email: "alicia@example.com",
+        role: "superuser",
+        active: false,
+        passwordHash: "x",
+        password: "newpassword",
+      });
 
       expect(res.status).toBe(200);
       expect(await findStored(id)).toEqual(before);
     });
 
-    it("keeps the user signed in after changing their email", async () => {
-      const { agent } = await signUp("alice@example.com");
-
-      await agent.patch("/users/me").send({ email: "alicia@example.com" }).expect(200);
-
-      const me = await agent.get("/users/me");
-      expect(expectUserResponse(me).email).toBe("alicia@example.com");
-      await request(app)
-        .post("/auth/login")
-        .send({ email: "alicia@example.com", password: PASSWORD })
-        .expect(200);
-    });
-
-    it("returns 409 when the email belongs to another user, ignoring case", async () => {
-      await signUp("bob@example.com");
-      const { agent, id } = await signUp("alice@example.com");
-
-      const res = await agent.patch("/users/me").send({ email: "BOB@example.com" });
-
-      expect(res.status).toBe(409);
-      expect(res.body).toEqual({ error: "Email is already registered" });
-      expect(await findStored(id)).toMatchObject({ email: "alice@example.com" });
-    });
-
     it.each([
-      ["invalid email", { email: "not-an-email" }],
       ["empty name", { name: "   " }],
       ["overlong name", { name: "a".repeat(101) }],
     ])("returns 400 for %s", async (_, body) => {

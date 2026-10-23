@@ -26,9 +26,9 @@ export const userListSchema = z.object({
   users: z.array(userSchema),
 });
 
-// Request bodies. Unlisted keys (role, active, ...) are stripped, so users can't escalate.
+// Request bodies. Unlisted keys (email, role, active, ...) are stripped, so users can't escalate.
 
-export const userPatchSchema = registerSchema.pick({ email: true, name: true }).partial();
+export const userPatchSchema = registerSchema.pick({ name: true }).partial();
 
 export const idParamSchema = z.object({
   id: z.uuid(),
