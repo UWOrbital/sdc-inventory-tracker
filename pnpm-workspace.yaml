@@ -11,3 +11,9 @@ allowBuilds:
 
 overrides:
   "@esbuild-kit/core-utils>esbuild": ^0.25.0
+
+auditConfig:
+  ignoreGhsas:
+    # braces DoS via nested patterns: no patched release exists yet (latest is 3.0.3).
+    # Dev-only via ts-node-dev and tsc-alias; remove once braces 3.0.4 is published.
+    - GHSA-vfj7-8cjw-p6xm
