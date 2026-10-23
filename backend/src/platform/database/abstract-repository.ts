@@ -1,7 +1,5 @@
-import { and, DrizzleQueryError, eq, getTableColumns, isNull, SQL } from "drizzle-orm";
+import { and, eq, getTableColumns, isNull, SQL } from "drizzle-orm";
 import { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
-import { DatabaseError } from "pg";
-import { PostgresError } from "pg-error-enum";
 
 import { Database } from "@/platform/database/pool";
 
@@ -11,14 +9,6 @@ type NewRow<T extends PgTableWithId> = T["$inferInsert"];
 type Id<T extends PgTableWithId> = Row<T>["id"];
 
 export class NotFoundError extends Error {}
-
-export function isUniqueViolation(err: unknown) {
-  return (
-    err instanceof DrizzleQueryError &&
-    err.cause instanceof DatabaseError &&
-    err.cause.code === PostgresError.UNIQUE_VIOLATION
-  );
-}
 
 export default abstract class AbstractRepository<T extends PgTableWithId> {
   protected abstract readonly table: T;

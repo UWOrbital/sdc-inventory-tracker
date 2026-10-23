@@ -4,7 +4,7 @@ import type { RegisterBody } from "@tracker/shared";
 
 import { hashPassword } from "@/platform/auth/password";
 import { clearAuthCookie, setAuthCookie, signAccessToken } from "@/platform/auth/tokens";
-import { isUniqueViolation } from "@/platform/database/abstract-repository";
+import { isUniqueViolation } from "@/platform/database/utils";
 import { UserRepository } from "@/users/users.service";
 
 export async function register(req: Request<object, object, RegisterBody>, res: Response) {
