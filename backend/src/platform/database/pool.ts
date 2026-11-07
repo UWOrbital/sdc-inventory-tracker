@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+import { schema } from "@/platform/database/schema";
 import { BackendSettings } from "@/platform/env/backend.env";
 
 export function makeDB(settings: BackendSettings) {
@@ -12,7 +13,7 @@ export function makeDB(settings: BackendSettings) {
     port: settings.db.DB_PORT,
   });
 
-  return drizzle({ client: pool });
+  return drizzle({ client: pool, schema });
 }
 
 export type Database = ReturnType<typeof makeDB>;
