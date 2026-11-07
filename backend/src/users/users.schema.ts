@@ -2,7 +2,7 @@ import { boolean, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-
 
 import { USER_ROLES } from "@tracker/shared";
 
-const userRole = pgEnum("user_role", USER_ROLES);
+export const userRole = pgEnum("user_role", USER_ROLES);
 
 export const user = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
