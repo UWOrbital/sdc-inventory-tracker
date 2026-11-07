@@ -2,15 +2,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
-import { ApiError } from "../api/client";
-import { getCurrentUser } from "../api/endpoints/users";
-import { userKeys } from "../hooks/useUsers";
-import { useAuth } from "./AuthContext";
-import { AuthProvider } from "./AuthProvider";
-import { RequireAuth } from "./RequireAuth";
+import { ApiError } from "@/api/client";
+import { getCurrentUser } from "@/api/endpoints/users";
+import { userKeys } from "@/hooks/useUsers";
+import { useAuth } from "@/auth/AuthContext";
+import { AuthProvider } from "@/auth/AuthProvider";
+import { RequireAuth } from "@/auth/RequireAuth";
 
-vi.mock("../api/endpoints/users", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../api/endpoints/users")>()),
+vi.mock("@/api/endpoints/users", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/api/endpoints/users")>()),
   getCurrentUser: vi.fn(),
 }));
 

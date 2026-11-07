@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { getCurrentUser } from "../api/endpoints/users";
+import type { getCurrentUser } from "@/api/endpoints/users";
 
 type User = Awaited<ReturnType<typeof getCurrentUser>>;
 

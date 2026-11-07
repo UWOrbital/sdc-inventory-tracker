@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { request } from "../client";
+import { request } from "@/api/client";
 import {
   activateUser,
   deactivateCurrentUser,
@@ -8,9 +8,9 @@ import {
   getCurrentUser,
   getUsers,
   updateCurrentUser,
-} from "./users";
+} from "@/api/endpoints/users";
 
-vi.mock("../client", () => ({ request: vi.fn() }));
+vi.mock("@/api/client", () => ({ request: vi.fn() }));
 const requestMock = vi.mocked(request);
 const user = {
   id: "123e4567-e89b-42d3-a456-426614174000",

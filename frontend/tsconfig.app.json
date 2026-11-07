@@ -10,6 +10,9 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "customConditions": ["@tracker/source"],
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,

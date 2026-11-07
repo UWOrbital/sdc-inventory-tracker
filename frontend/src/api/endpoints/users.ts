@@ -5,7 +5,7 @@ import {
   userSchema,
   type UserPatchRequest,
 } from "@tracker/shared";
-import { request } from "../client";
+import { request } from "@/api/client";
 
 type MessageResponse = { message: string };
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { ApiError } from "../api/client";
-import { useCurrentUser } from "../hooks/useUsers";
-import { AuthContext, type AuthState } from "./AuthContext";
+import { ApiError } from "@/api/client";
+import { useCurrentUser } from "@/hooks/useUsers";
+import { AuthContext, type AuthState } from "@/auth/AuthContext";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const query = useCurrentUser();
