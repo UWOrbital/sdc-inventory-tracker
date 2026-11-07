@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from "node:url";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { defaultClientConditions } from "vite";
@@ -8,6 +9,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   // Resolve @tracker/shared to its TypeScript source so edits show up without rebuilding it.
   resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
     conditions: ["@tracker/source", ...defaultClientConditions],
   },
   test: {

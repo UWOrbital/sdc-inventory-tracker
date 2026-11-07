@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, expect, it, vi } from "vitest";
-import * as users from "../api/endpoints/users";
+import * as users from "@/api/endpoints/users";
 import {
   userKeys,
   useCurrentUser,
@@ -11,9 +11,9 @@ import {
   useDeleteUser,
   useActivateUser,
   useDeactivateUser,
-} from "./useUsers";
+} from "@/hooks/useUsers";
 
-vi.mock("../api/endpoints/users");
+vi.mock("@/api/endpoints/users");
 afterEach(() => {
   vi.resetAllMocks();
 });

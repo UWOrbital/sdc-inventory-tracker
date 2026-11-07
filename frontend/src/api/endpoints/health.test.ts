@@ -1,8 +1,8 @@
 import { expect, it, vi } from "vitest";
-import { request } from "../client";
-import { getHealth } from "./health";
+import { request } from "@/api/client";
+import { getHealth } from "@/api/endpoints/health";
 
-vi.mock("../client", () => ({ request: vi.fn() }));
+vi.mock("@/api/client", () => ({ request: vi.fn() }));
 
 it("requests the health endpoint", async () => {
   vi.mocked(request).mockResolvedValue({ message: "PONG", db: "ok" });

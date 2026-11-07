@@ -7,7 +7,7 @@ import {
   getCurrentUser,
   getUsers,
   updateCurrentUser,
-} from "../api/endpoints/users";
+} from "@/api/endpoints/users";
 
 export const userKeys = {
   all: ["users"] as const,
